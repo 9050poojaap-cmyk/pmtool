@@ -1,130 +1,116 @@
-# Advanced Project Management Tool
+# 🚀 PM Tool – Project Management App
 
-Full-stack app: **React + Redux Toolkit + Tailwind**, **Express + MongoDB + Socket.IO**, **JWT**, **Cloudinary**, **Recharts**, **frappe-gantt** (loaded via CDN for Vite compatibility).
+A modern full-stack **Project Management Tool** built to organize tasks, collaborate with teams, and boost productivity 📈
 
-## Folder structure
+---
 
-```text
-pmtool/
-├── README.md
-├── .env.sample
-├── server/
-│   ├── package.json
-│   └── src/
-│       ├── index.js              # HTTP + Socket.IO entry
-│       ├── config/               # MongoDB, Cloudinary
-│       ├── models/               # User, Project, Task, Comment, ActivityLog, TaskVersion
-│       ├── routes/               # auth, projects, tasks, comments, misc
-│       ├── controllers/
-│       ├── middleware/           # JWT auth, project roles, uploads
-│       ├── services/             # activity log, mailer, task versions
-│       ├── socket/               # broadcast helpers
-│       └── jobs/                 # deadline reminder loop
-└── client/
-    ├── package.json
-    ├── vite.config.js
-    ├── index.html                # frappe-gantt CDN
-    └── src/
-        ├── main.jsx
-        ├── App.jsx
-        ├── api/                  # axios client + REST helpers
-        ├── socket.js             # realtime tasks, notifications
-        ├── store/                # Redux slices
-        ├── pages/
-        ├── components/
-        └── utils/
-```
+## ✨ Features
 
-## Features implemented
+* 🗂️ Create & manage projects
+* ✅ Task creation with status (To Do / In Progress / Done)
+* 🎯 Priority & deadline tracking
+* 📎 File attachments (Cloudinary integration)
+* 💬 Comments & real-time updates
+* 🧑‍🤝‍🧑 Team collaboration
+* 🌙 Dark mode support
+* 📊 Analytics & activity tracking
 
-- **Auth:** Register / login, bcrypt passwords, JWT, `GET /auth/me`.
-- **Projects:** Create, list, update (project **admin** only), add/remove members, member roles (`admin` | `member` inside the project).
-- **Tasks:** CRUD with pagination & filters (status, priority, assignee, label, title search); drag-and-drop Kanban (`react-beautiful-dnd`) with `PUT /tasks/move` + column reorder.
-- **Comments:** Threaded replies; realtime `comment:added` per project room.
-- **Attachments:** `POST /upload` → Cloudinary; URLs stored on tasks.
-- **Realtime:** Socket.IO for task create/update/move/delete, comment events, user notifications (assigned / comment).
-- **Analytics:** Totals, completion %, per-user counts, Recharts.
-- **Activity log:** Paginated audit trail.
-- **Gantt:** Timelines from `createdAt` → `dueDate` (frappe-gantt 0.6.1 via CDN).
-- **Version history & rollback:** Snapshots on updates/moves; `POST /tasks/rollback/:projectId/:taskId`.
-- **Email:** Nodemailer hooks for assignment + deadline reminders (optional SMTP).
-- **Dark mode:** Tailwind `class` strategy + Redux `ui` slice.
+---
 
-## RBAC summary
+## 🛠️ Tech Stack
 
-| Action                         | Project admin | Project member |
-| ------------------------------ | ------------- | -------------- |
-| Edit project / members / roles | Yes           | No             |
-| Create / edit tasks            | Yes           | Yes            |
-| Delete task                    | Yes           | No (API 403)   |
+**Frontend**
 
-Global `User.role` (`admin` | `member`) exists on the user model for future use; **project** permissions use **project member role**.
+* ⚛️ React + Vite
+* 🎨 Tailwind CSS
+* 🧠 Redux Toolkit
 
-## Run locally
+**Backend**
 
-### 1. MongoDB
+* 🟢 Node.js + Express
+* 🍃 MongoDB (Mongoose)
+* 🔐 JWT Authentication
 
-Run MongoDB 6+ locally or use Atlas and set `MONGODB_URI`.
+**Other Tools**
 
-### 2. Backend
+* ☁️ Cloudinary (file uploads)
+* 🔌 Socket.IO (real-time features)
+* 🚀 Render (backend hosting)
+* 🌐 Vercel (frontend hosting)
+
+---
+
+## 🔗 Live Demo
+
+👉 **Frontend:** https://pmtool-omega.vercel.app/
+👉 **Backend:** https://pmtool-backend-5lju.onrender.com
+
+---
+
+## ⚙️ Installation
 
 ```bash
+# Clone the repository
+git clone https://github.com/your-username/pmtool.git
+
+# Install dependencies
+cd client
+npm install
+
+cd ../server
+npm install
+```
+
+---
+
+## ▶️ Run Locally
+
+```bash
+# Start backend
 cd server
-cp ../.env.sample .env
-# Edit .env: MONGODB_URI, JWT_SECRET, Cloudinary keys (for uploads)
-npm install
+npm run dev
+
+# Start frontend
+cd client
 npm run dev
 ```
 
-API default: `http://localhost:5000`  
-Health: `GET http://localhost:5000/health`
+---
 
-### 3. Frontend
+## 🌱 Environment Variables
 
-```bash
-cd client
-# Optional: client/.env with VITE_SOCKET_URL=http://localhost:5000
-npm install
-npm run dev
+Create a `.env` file in the **server** folder:
+
+```
+MONGODB_URI=your_mongodb_uri
+JWT_SECRET=your_secret
+CLOUDINARY_CLOUD_NAME=your_name
+CLOUDINARY_API_KEY=your_key
+CLOUDINARY_API_SECRET=your_secret
 ```
 
-UI: `http://localhost:5173` — Vite proxies `/api` → `http://localhost:5000`.
+---
 
-### 4. Production build (client)
+## 💡 Future Improvements
 
-```bash
-cd client
-npm run build
-npm run preview
-```
+* 🔔 Notifications system
+* 📱 Mobile responsiveness enhancements
+* 🤖 AI-based task suggestions
+* 📅 Calendar integration
 
-Serve `client/dist` behind your CDN or static host and set `VITE_API_URL` / `VITE_SOCKET_URL` to your API host when rebuilding.
+---
 
-## API map (high level)
+## 🙌 Acknowledgements
 
-| Method | Path | Notes |
-| ------ | ---- | ----- |
-| POST | `/auth/register`, `/auth/login` | JWT |
-| GET | `/auth/me` | Bearer token |
-| POST | `/projects/create` | Auth |
-| GET | `/projects`, `/projects/:id` | Member |
-| PUT | `/projects/:id` | Project admin |
-| POST | `/projects/add-member` | Body: `projectId`, `email`, `role` |
-| POST | `/tasks/create` | Body: `projectId`, … |
-| GET | `/tasks/:projectId` | Query: `page`,`limit`,`status`,`priority`,`assignedTo`,`label`,`search` |
-| PUT | `/tasks/update/:projectId/:taskId` | |
-| PUT | `/tasks/move` | Body: `projectId`, `taskId`, `status`, optional `position` |
-| PUT | `/tasks/reorder/:projectId` | Body: `status`, `orderedTaskIds` |
-| DELETE | `/tasks/delete/:projectId/:taskId` | Project admin |
-| POST | `/comments/add` | |
-| GET | `/comments/:taskId` | |
-| GET | `/analytics/:projectId` | |
-| GET | `/activity/:projectId` | |
-| POST | `/upload` | `multipart/form-data` field `file` |
-| GET | `/users/search?q=` | |
+Built with lots of learning, debugging, and persistence 💙
+A big step towards becoming a full-stack developer 🚀
 
-## Notes
+---
 
-- **frappe-gantt:** The npm package entry points at SCSS sources; this project loads **frappe-gantt 0.6.1** CSS + JS from jsDelivr in `client/index.html` so Vite builds without Sass.
-- **Emails:** If `SMTP_HOST` is empty, mail calls no-op with a console warning.
-- **react-beautiful-dnd:** Deprecated but included as specified; consider `@hello-pangea/dnd` later for React 18 + Strict Mode ergonomics.
+## 📌 Author
+
+👩‍💻 **Poojaa**
+
+---
+
+⭐ If you like this project, consider giving it a star!
